@@ -88,7 +88,7 @@ Support
 =======
 Please create an issue on this GitHub for any questions instead of sending a private message. This allows other people with the same question to find your answer.
 
-Scribble
+Scribble (added by Jongwon Lee (jongwon5@illinois.edu))
 =======
 
 ## Installation
