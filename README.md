@@ -87,3 +87,29 @@ You can generate your own tag families using our other repo, [AprilTag-Generatio
 Support
 =======
 Please create an issue on this GitHub for any questions instead of sending a private message. This allows other people with the same question to find your answer.
+
+Scribble
+=======
+
+## Installation
+```
+cmake -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+```
+
+## Run OpenCV demo
+Prerequisite: 
+- [OpenCV](https://opencv.org/) (Version 4.x preferred)
+- Camera connected to the computer
+
+To run tag36h11 (the tag family for non-nested layout) detection, run
+```
+./build/opencv_demo -f tag36h11
+```
+
+To run tag52h12 (the tag family for nested layout) detection, run
+```
+./build/opencv_demo -f tag52h12
+```
+
+Please refer to [example/opencv_demo.cc](example/opencv_demo.cc) and the [user guide](https://github.com/AprilRobotics/apriltag/wiki/AprilTag-User-Guide) to explore more features.
