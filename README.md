@@ -91,11 +91,37 @@ Please create an issue on this GitHub for any questions instead of sending a pri
 Scribble (added by Jongwon Lee (jongwon5@illinois.edu))
 =======
 
+## What's added
+1. `tagCustom52h12` codes:
+   - [tagCustom52h12.c](tagCustom52h12.c)
+   - [tagCustom52h12.h](tagCustom52h12.h)
+2. `tagCustom52h12`-relevant things are appended to the hard-coded list of Apriltag families to be built for detection mode, especially the following files:
+   - [apriltag_pywrap.c](apriltag_pywrap.c)
+   - [example/apriltag_demo.c](example/apriltag_demo.c)
+   - [example/opencv_demo.c](example/opencv_demo.c)
+
 ## Installation
 ```
 cmake -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 ```
+
+Note 1: `undefined symbol error` for hard-coded Apriltag family occurs when set `-DCMAKE_BUILD_TYPE=Release`.
+Note 2: `--target install` flag can be added to the `cmake --build build` if installing the libraries to the system (i.e., to make it installed to the right Python library directory) is needed
+
+## Run C demo
+To run tag36h11 (the tag family for non-nested layout) detection, run
+```
+./build/apriltag_demo -f tag36h11 ./example/non_nested_000_resized.jpg
+```
+
+To run tag52h12 (the tag family for nested layout) detection, run
+```
+./build/apriltag_demo -f tagCustom52h12 ./example/nested_000_resized.jpg
+```
+
+## Run Python demo
+Please refer to [example/py_demo.ipynb] for details.
 
 ## Run OpenCV demo
 Prerequisite: 
