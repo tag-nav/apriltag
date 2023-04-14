@@ -16,6 +16,7 @@
 #include "tagCustom48h12.h"
 #include "tagStandard41h12.h"
 #include "tagStandard52h13.h"
+#include "tagCustom52h12.h"
 
 
 #define SUPPORTED_TAG_FAMILIES(_)           \
@@ -27,7 +28,8 @@
     _(tagCircle49h12)                       \
     _(tagStandard41h12)                     \
     _(tagStandard52h13)                     \
-    _(tagCustom48h12)
+    _(tagCustom48h12)                       \
+    _(tagCustom52h12)
 
 #define TAG_CREATE_FAMILY(name) \
     else if (0 == strcmp(family, #name)) self->tf = name ## _create();
