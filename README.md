@@ -102,12 +102,11 @@ Scribble (added by Jongwon Lee (jongwon5@illinois.edu))
 
 ## Installation
 ```
-cmake -B build -DCMAKE_BUILD_TYPE=Debug
-cmake --build build
+$ cmake -B build -DCMAKE_BUILD_TYPE=Release
+$ cmake --build build --target install
 ```
 
-Note 1: `undefined symbol error` for hard-coded Apriltag family occurs when set `-DCMAKE_BUILD_TYPE=Release`.
-Note 2: `--target install` flag can be added to the `cmake --build build` if installing the libraries to the system (i.e., to make it installed to the right Python library directory) is needed
+Note: Make sure that the Python wrapper is successfully installed only when an environment `conda` is deactivated. 
 
 ## Run C demo
 To run tag36h11 (the tag family for non-nested layout) detection, run
@@ -122,6 +121,13 @@ To run tag52h12 (the tag family for nested layout) detection, run
 
 ## Run Python demo
 Please refer to [example/py_demo.ipynb] for details.
+
+Note: If the installed python library is not loaded, please follow the commands below [[reference](https://github.com/AprilRobotics/apriltag/issues/46#issuecomment-556875247)] and try it again:
+```
+$ echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+$ source ~/.bashrc
+$ sudo ldconfig
+```
 
 ## Run OpenCV demo
 Prerequisite: 
