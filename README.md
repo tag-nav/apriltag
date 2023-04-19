@@ -8,28 +8,28 @@ $ cmake -B build -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build --target install
 ```
 
-Note: Make sure that the Python wrapper is successfully installed only when an environment `conda` is deactivated. 
+Note: Make sure that the Python wrapper is successfully installed only when an environment [Conda](https://docs.conda.io/projects/conda/en/latest/index.html) is deactivated. 
 
 ## 2. Run demos with Python wrapper
 The original implementation for detecting Apriltags in multiscale layouts is in C, and it includes a Python-wrapped library to make development more accessible. This section shows how to use this to demo marker detection on both image and video.
 
 ### 2-1. Run demo with image
 
-Please refer to [example/image_demo.ipynb] and [example/image_demo.py] for details.
+Please refer to [example/image_demo.ipynb](example/image_demo.ipynb) and [example/image_demo.py](example/image_demo.py) for details.
 
-To run non-nested marker layout detection (with the Tag36h11 family) on [img/non_nested_TLOF.png], run the following command:
+To run non-nested marker layout detection (with the Tag36h11 family) on [img/non_nested_TLOF.png](img/non_nested_TLOF.png), run the following command:
 ```
 $ python example/image_demo.py --img img/non_nested_TLOF.png --tagtype tag36h11
 ```
 
-To run nested marker layout detection (with the tagCustom52h12 family) on [img/nested_TLOF.png], run the following command:
+To run nested marker layout detection (with the tagCustom52h12 family) on [img/nested_TLOF.png](img/nested_TLOF.png), run the following command:
 ```
 $ python example/image_demo.py --img img/nested_TLOF.png --tagtype tagCustom52h12
 ```
 
 ### 2-2. Run demo with video
 
-Please refer to [example/video_demo.py] for details. 
+Please refer to [example/video_demo.py](example/video_demo.py) for details. 
 
 To run non-nested marker layout detection (with the Tag36h11 family), run the following command:
 ```
