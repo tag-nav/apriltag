@@ -30,7 +30,7 @@ def annotate_detections(img, detections, thickness=2):
         corners = corners.reshape((-1, 1, 2))
 
         # Draw a box around the quadrilateral on the input image
-        cv2.polylines(img, [corners], True, (255, 0, 0), thickness)
+        cv2.polylines(img, [corners], True, (0, 0, 255), thickness)     # BGR
 
         # Define the text to be displayed
         text = f"id: {detection['id']}"
@@ -39,7 +39,7 @@ def annotate_detections(img, detections, thickness=2):
         loc = detection['center'].astype(np.int32)
 
         # Draw the text on the input image at the specified location
-        cv2.putText(img, text, loc, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), thickness)
+        cv2.putText(img, text, loc, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), thickness)    # BGR
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -80,6 +80,6 @@ if __name__ == "__main__":
     annotate_detections(im, detections, thickness=args.stroke)
 
     # Display the image
-    plt.imshow(im)
+    plt.imshow(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
     plt.axis('off')
     plt.show()
