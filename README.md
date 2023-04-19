@@ -21,11 +21,13 @@ To run non-nested marker layout detection (with the Tag36h11 family) on [img/non
 ```
 $ python example/image_demo.py --img img/non_nested_TLOF.png --tagtype tag36h11
 ```
+<img src="img/examples/image_demo_non_nested.png" alt= “” width="200" height="200">
 
 To run nested marker layout detection (with the tagCustom52h12 family) on [img/nested_TLOF.png](img/nested_TLOF.png), run the following command:
 ```
 $ python example/image_demo.py --img img/nested_TLOF.png --tagtype tagCustom52h12
 ```
+<img src="img/examples/image_demo_nested.png" alt= “” width="200" height="200">
 
 ### 2-2. Run demo with video
 
@@ -35,11 +37,13 @@ To run non-nested marker layout detection (with the Tag36h11 family), run the fo
 ```
 $ python example/video_demo.py --video 0 --tagtype tag36h11
 ```
+<img src="img/examples/video_demo_non_nested.png" alt= “” width="320" height="240">
 
 To run nested marker layout detection (with the tagCustom52h12 family), run the following command:
 ```
 $ python example/video_demo.py --video 0 --tagtype tagCustom52h12
 ```
+<img src="img/examples/video_demo_nested.png" alt= “” width="320" height="240">
 
 Note: If the installed Python library is not loaded, follow the commands below [[reference](https://github.com/AprilRobotics/apriltag/issues/46#issuecomment-556875247)] and try again:
 ```
