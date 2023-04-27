@@ -68,6 +68,9 @@ if __name__ == "__main__":
         print("Error: Could not open camera")
         exit()
 
+    # Turn off autofocus
+    cap.set(cv2.CAP_PROP_AUTOFOCUS, 0)
+
     # Create an Apriltag detector
     detector = apriltag(args.tagtype)
 
