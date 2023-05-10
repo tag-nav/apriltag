@@ -18,6 +18,11 @@ Note: Make sure that the Python wrapper is successfully installed only when an e
 ## 2. Run demos with Python wrapper
 The original implementation for detecting Apriltags in multiscale layouts is in C, and it includes a Python-wrapped library to make development more accessible. This section shows how to use this to demo marker detection on both image and video.
 
+Before executing the demos below, make sure apriltag is installed. Or,
+```
+$ pip install apriltag
+```
+
 ### 2-1. Run demo with image
 
 Please refer to [example/image_demo.ipynb](example/image_demo.ipynb) and [example/image_demo.py](example/image_demo.py) for details.
