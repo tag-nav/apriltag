@@ -2,6 +2,11 @@
 This repository provides instructions for detecting multiscale fiducial marker layouts, including non-nested and nested layouts, designed for precise takeoff and landing of flying vehicles integrated into vertiports.
 
 ## 1. Installation
+Clone this git repository
+```
+$ git clone 
+```
+
 To install the library, run the following commands in your terminal:
 ```
 $ cmake -B build -DCMAKE_BUILD_TYPE=Release
