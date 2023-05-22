@@ -4,7 +4,7 @@ This repository provides instructions for detecting multiscale fiducial marker l
 ## 1. Installation
 Clone this git repository
 ```
-$ git clone git@github.com:tag-nav/multiscale-marker-detection.git
+$ git clone https://github.com/tag-nav/multiscale-marker-detection.git
 ```
 
 To install the library, run the following commands in your terminal:
