@@ -164,6 +164,9 @@ endif (NOT Python3_NOT_FOUND AND NOT Numpy_NOT_FOUND AND PYTHONLIBS_FOUND AND BU
 add_executable(apriltag_demo example/apriltag_demo.c)
 target_link_libraries(apriltag_demo ${PROJECT_NAME})
 
+add_executable(apriltag_threshold example/apriltag_threshold.c)
+target_link_libraries(apriltag_threshold ${PROJECT_NAME})
+
 # opencv_demo
 # set(_OpenCV_REQUIRED_COMPONENTS core imgproc videoio highgui)
 # find_package(OpenCV COMPONENTS ${_OpenCV_REQUIRED_COMPONENTS} QUIET CONFIG)
@@ -185,3 +188,4 @@ target_link_libraries(apriltag_demo ${PROJECT_NAME})
 
 # install example programs
 install(TARGETS apriltag_demo RUNTIME DESTINATION bin)
+install(TARGETS apriltag_threshold RUNTIME DESTINATION bin)

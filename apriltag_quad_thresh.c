@@ -1688,6 +1688,7 @@ zarray_t* gradient_clusters(apriltag_detector_t *td, image_u8_t* threshim, int w
         tasks[ntasks].clusters = zarray_create(sizeof(struct cluster_hash*));
 
         workerpool_add_task(td->wp, do_cluster_task, &tasks[ntasks]);
+        // workerpool_add_task(td->wp, tasks, &tasks[ntasks]);
         ntasks++;
     }
 
@@ -1776,6 +1777,73 @@ zarray_t* fit_quads(apriltag_detector_t *td, int w, int h, zarray_t* clusters, i
     return quads;
 }
 
+
+
+void dilate(image_u8_t *input, image_u8_t *temp, int se_size) {
+    int se_radius = se_size / 2;
+    
+    for (int y = 0; y < input->height; y++) {
+        for (int x = 0; x < input->width; x++) {
+            int max_val = 0;
+            for (int dy = -se_radius; dy <= se_radius; dy++) {
+                for (int dx = -se_radius; dx <= se_radius; dx++) {
+                    int ny = y + dy;
+                    int nx = x + dx;
+                    if (ny >= 0 && ny < input->height && nx >= 0 && nx < input->width) {
+                        if (input->buf[ny * input->stride + nx] > max_val) {
+                            max_val = input->buf[ny * input->stride + nx];
+                        }
+                    }
+                }
+            }
+            temp->buf[y * temp->stride + x] = max_val;
+        }
+    }
+}
+
+void erode(image_u8_t *temp, image_u8_t *input, int se_size) {
+    int se_radius = se_size / 2;
+    
+    for (int y = 0; y < input->height; y++) {
+        for (int x = 0; x < input->width; x++) {
+            int min_val = 255;
+            for (int dy = -se_radius; dy <= se_radius; dy++) {
+                for (int dx = -se_radius; dx <= se_radius; dx++) {
+                    int ny = y + dy;
+                    int nx = x + dx;
+                    if (ny >= 0 && ny < input->height && nx >= 0 && nx < input->width) {
+                        if (temp->buf[ny * temp->stride + nx] < min_val) {
+                            min_val = temp->buf[ny * temp->stride + nx];
+                        }
+                    }
+                }
+            }
+            input->buf[y * input->stride + x] = min_val;
+        }
+    }
+}
+
+void morphological_closing(image_u8_t *input, int se_size) {
+    int w = input->width, h = input->height;
+    image_u8_t *temp = image_u8_create(w, h);
+
+    dilate(input, temp, se_size);
+    erode(temp, input, se_size);
+
+    image_u8_destroy(temp);
+}
+
+void morphological_opening(image_u8_t *input, int se_size) {
+    int w = input->width, h = input->height;
+    image_u8_t *temp = image_u8_create(w, h);
+
+    erode(input, temp, se_size);
+    dilate(temp, input, se_size);
+
+    image_u8_destroy(temp);
+}
+
+
 zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
 {
     ////////////////////////////////////////////////////////
@@ -1788,7 +1856,6 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
 
     if (td->debug)
         image_u8_write_pnm(threshim, "debug_threshold.pnm");
-
 
     ////////////////////////////////////////////////////////
     // step 2. find connected components.
@@ -1826,12 +1893,10 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
             }
         }
 
-        free(colors);
-
+        free(colors);   
         image_u8x3_write_pnm(d, "debug_segmentation.pnm");
         image_u8x3_destroy(d);
     }
-
 
     timeprofile_stamp(td->tp, "unionfind");
 
@@ -1869,14 +1934,88 @@ zarray_t *apriltag_quad_thresh(apriltag_detector_t *td, image_u8_t *im)
         image_u8x3_destroy(d);
     }
 
+    // Edge removal for the original image
+    for (int i = 0; i < zarray_size(clusters); i++) {
+        zarray_t *cluster;
+        zarray_get(clusters, i, &cluster);
+
+        for (int j = 0; j < zarray_size(cluster); j++) {
+            struct pt *p;
+            zarray_get_volatile(cluster, j, &p);
+
+            int x = p->x / 2;
+            int y = p->y / 2;
+
+            im->buf[y*im->stride + x] = 0;
+
+        }
+    }
+
+    int se_size = 3;
+    morphological_opening(im, se_size);
+
+    if (td->debug)
+        image_u8_write_pnm(im, "debug_mask.pnm");
+
+
+    // Redo threshold and cluster
+    image_u8_t *threshim1 = threshold(td, im);
+    int ts1 = threshim->stride;
+
+    if (td->debug)
+        image_u8_write_pnm(threshim1, "debug_threshold_after.pnm");
+
+    unionfind_t* uf1 = connected_components(td, threshim1, w, h, ts1);
+
+    timeprofile_stamp(td->tp, "unionfind");
+
+    zarray_t* clusters1 = gradient_clusters(td, threshim1, w, h, ts1, uf1);
+
+    if (td->debug) {
+        image_u8x3_t *dd = image_u8x3_create(w, h);
+
+        for (int i = 0; i < zarray_size(clusters1); i++) {
+            zarray_t *cluster;
+            zarray_get(clusters1, i, &cluster);
+
+            uint32_t r, g, b;
+
+            if (1) {
+                const int bias = 50;
+                r = bias + (random() % (200-bias));
+                g = bias + (random() % (200-bias));
+                b = bias + (random() % (200-bias));
+            }
+
+            for (int j = 0; j < zarray_size(cluster); j++) {
+                struct pt *p;
+                zarray_get_volatile(cluster, j, &p);
+
+                int x = p->x / 2;
+                int y = p->y / 2;
+                dd->buf[y*dd->stride + 3*x + 0] = r;
+                dd->buf[y*dd->stride + 3*x + 1] = g;
+                dd->buf[y*dd->stride + 3*x + 2] = b;
+
+            }
+        }
+        image_u8x3_write_pnm(dd, "debug_clusters_after.pnm");
+        image_u8x3_destroy(dd);
+    }
+
+
+
+
+
 
     image_u8_destroy(threshim);
     timeprofile_stamp(td->tp, "make clusters");
 
+
     ////////////////////////////////////////////////////////
     // step 3. process each connected component.
 
-    zarray_t* quads = fit_quads(td, w, h, clusters, im);
+    zarray_t* quads = fit_quads(td, w, h, clusters1, im);
 
     if (td->debug) {
         FILE *f = fopen("debug_lines.ps", "w");

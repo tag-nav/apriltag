@@ -380,7 +380,7 @@ apriltag_detector_t *apriltag_detector_create()
     td->decode_sharpening = 0.25;
 
 
-    td->debug = false;
+    td->debug = true;
 
     // NB: defer initialization of td->wp so that the user can
     // override td->nthreads.
@@ -1081,6 +1081,9 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
 
     zarray_t *quads = apriltag_quad_thresh(td, quad_im);
 
+    if (td->debug)
+        image_u8_write_pnm(quad_im, "debug_quad_im_after.pnm");
+
     // adjust centers of pixels so that they correspond to the
     // original full-resolution image.
     if (td->quad_decimate > 1) {
@@ -1100,8 +1103,8 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
         }
     }
 
-    if (quad_im != im_orig)
-        image_u8_destroy(quad_im);
+    // if (quad_im != im_orig)
+    //     image_u8_destroy(quad_im);
 
     zarray_t *detections = zarray_create(sizeof(apriltag_detection_t*));
 
@@ -1110,7 +1113,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
     timeprofile_stamp(td->tp, "quads");
 
     if (td->debug) {
-        image_u8_t *im_quads = image_u8_copy(im_orig);
+        image_u8_t *im_quads = image_u8_copy(quad_im);
         image_u8_darken(im_quads);
         image_u8_darken(im_quads);
 
@@ -1136,7 +1139,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
     ////////////////////////////////////////////////////////////////
     // Step 2. Decode tags from each quad.
     if (1) {
-        image_u8_t *im_samples = td->debug ? image_u8_copy(im_orig) : NULL;
+        image_u8_t *im_samples = td->debug ? image_u8_copy(quad_im) : NULL;
 
         int chunksize = 1 + zarray_size(quads) / (APRILTAG_TASKS_PER_THREAD_TARGET * td->nthreads);
 
@@ -1148,7 +1151,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
             tasks[ntasks].i1 = imin(zarray_size(quads), i + chunksize);
             tasks[ntasks].quads = quads;
             tasks[ntasks].td = td;
-            tasks[ntasks].im = im_orig;
+            tasks[ntasks].im = quad_im;
             tasks[ntasks].detections = detections;
 
             tasks[ntasks].im_samples = im_samples;
@@ -1168,7 +1171,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
     }
 
     if (td->debug) {
-        image_u8_t *im_quads = image_u8_copy(im_orig);
+        image_u8_t *im_quads = image_u8_copy(quad_im);
         image_u8_darken(im_quads);
         image_u8_darken(im_quads);
 
@@ -1271,7 +1274,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
     // Produce final debug output
     if (td->debug) {
 
-        image_u8_t *darker = image_u8_copy(im_orig);
+        image_u8_t *darker = image_u8_copy(quad_im);
         image_u8_darken(darker);
         image_u8_darken(darker);
 
@@ -1311,13 +1314,13 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
     }
 
     if (td->debug) {
-        image_u8_t *darker = image_u8_copy(im_orig);
+        image_u8_t *darker = image_u8_copy(quad_im);
         image_u8_darken(darker);
         image_u8_darken(darker);
 
         image_u8x3_t *out = image_u8x3_create(darker->width, darker->height);
-        for (int y = 0; y < im_orig->height; y++) {
-            for (int x = 0; x < im_orig->width; x++) {
+        for (int y = 0; y < quad_im->height; y++) {
+            for (int x = 0; x < quad_im->width; x++) {
                 out->buf[y*out->stride + 3*x + 0] = darker->buf[y*darker->stride + x];
                 out->buf[y*out->stride + 3*x + 1] = darker->buf[y*darker->stride + x];
                 out->buf[y*out->stride + 3*x + 2] = darker->buf[y*darker->stride + x];
@@ -1403,6 +1406,7 @@ zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig)
     }
 
     zarray_destroy(quads);
+    image_u8_destroy(quad_im);
 
     zarray_sort(detections, detection_compare_function);
     timeprofile_stamp(td->tp, "cleanup");

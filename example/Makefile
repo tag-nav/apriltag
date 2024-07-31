@@ -9,9 +9,13 @@ LDFLAGS = -lpthread -lm
 TARGETS := apriltag_demo opencv_demo
 
 .PHONY: all
-all: apriltag_demo opencv_demo
+all: apriltag_demo opencv_demo aptiltag_threshold
 
 apriltag_demo: apriltag_demo.o ../libapriltag.a
+	@echo "   [$@]"
+	@$(CC) -o $@ $^ $(LDFLAGS)
+
+apriltag_demo: apriltag_threshold.o ../libapriltag.a
 	@echo "   [$@]"
 	@$(CC) -o $@ $^ $(LDFLAGS)
 
